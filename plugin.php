@@ -7,8 +7,6 @@
  * Version: 1.0.0
  */
 
-// 🕸 \\
-
 namespace FDD\Core;
 
 function menu_search_form($title, $item, $args, $depth) {
