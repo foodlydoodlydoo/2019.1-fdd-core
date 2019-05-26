@@ -56,7 +56,7 @@ function _find_node($node_list, $attr, $value) {
   }
 
   foreach ($node_list as $node) {
-    if (preg_match($value, $node->attributes[$attr])) {
+    if (preg_match($value, $node->getAttribute($attr))) {
       return $node;
     }
   }
@@ -71,7 +71,7 @@ function _find_child_node($node, $attr, $value) {
 
   $node = $node->firstChild;
   while ($node) {
-    if (preg_match($value, $node->attributes[$attr])) {
+    if (preg_match($value, $node->getAttribute($attr))) {
       return $node;
     }
     $node = $node->nextSibling;
@@ -86,11 +86,13 @@ function _get_inner_text($node) {
   }
 
   $text = $node->textContent;
+  $text = trim($text);
   if (!$text) {
     // Just the first...?
     return _get_inner_text($node->firstChild);
   }
-  return trim($text);
+
+  return $text;
 }
 
 function _convert_recipe_specs($node) {
@@ -110,26 +112,30 @@ function _convert_recipe_specs($node) {
   $specs = $specs->nextSibling;
   $portions = _get_inner_text($specs);
 
-  $result .= "<!-- wp:fdd-block/recipe--characteristics {\"level\":\"$level\",\"prep_time\":\"$prep_time\",\"cook_time\":\"$cook_time\",\"portions\":\"$portions\"} /-->\n";
+  $result .= "<!-- wp:fdd-block/recipe--characteristics {\"level\":\"$level\",\"prep_time\":\"$prep_time\",\"cook_time\":\"$cook_time\",\"portions\":\"$portions\"} /-->\n\n";
 
   return $result;
 }
 
 function _convert_recipe_paras($doc, $text_nodes) {
   foreach ($text_nodes as $node) {
+    if (!preg_match("/-column-/", $node->getAttribute('module_class'))) {
+      continue;
+    }
+
     $node = $node->firstChild;
     $content = '';
     while ($node) {
-      $class = in_array("class", $node->attributes) ? $node->attributes['class'] : false;
+      $class = $node->getAttribute('class');
 
-      if (preg_match("/-title/", $class)) {
+      if (preg_match("/-title$/", $class)) {
         $title = _get_inner_text($node);
         continue;
       }
-      if (preg_match("/-subtitle/", $class)) {
-        $content .= "<!-- wp:paragraph -->\n<p>\n";
+      if (preg_match("/-subtitle$/", $class)) {
+        $content .= "<!-- wp:paragraph -->\n<p><strong>\n";
         $content .= _get_inner_text($node);
-        $content .= "\n</p>\n<!-- /wp:paragraph -->\n";
+        $content .= "\n</strong></p>\n<!-- /wp:paragraph -->\n";
         continue;
       }
 
@@ -161,7 +167,9 @@ function _convert_recipe_paras($doc, $text_nodes) {
       $node = $node->nextSibling;
     }
 
-    $class_name = preg_match("/Ingre/i", $title) ? ",\"className\":\"is-style-two-columns\"" : '';
+    $title = strtolower($title);
+    $title = ucfirst($title);
+    $class_name = preg_match("/Ingre/", $title) ? ",\"className\":\"is-style-two-columns\"" : '';
     $result .= "<!-- wp:fdd-block/para-with-title {\"title\":\"$title\"$class_name} -->\n";
     $result .= $content;
     $result .= "<!-- /wp:fdd-block/para-with-title -->\n";
@@ -173,12 +181,13 @@ function _convert_recipe_paras($doc, $text_nodes) {
 function _convert_recipe($doc) {
   $images = $doc->getElementsByTagName('et_pb_image');
   $text_nodes = $doc->getElementsByTagName('et_pb_text');
+  $videos = $doc->getElementsByTagName('et_pb_video');
 
   $result .= "<!-- wp:fdd-block/recipe--page -->\n";
 
   $result .= "<!-- wp:fdd-block/recipe--media -->\n";
   foreach ($images as $image) {
-    $src = $image->attributes['src'];
+    $src = $image->getAttribute('src');
     $src = str_replace(SOURCE_DOMAIN, DESTINATION_DOMAIN, $src);
     $image_id = attachment_url_to_postid($src);
     if (!$image_id) {
@@ -188,6 +197,33 @@ function _convert_recipe($doc) {
     $result .= "<!-- wp:image {\"id\":$image_id,\"linkDestination\":\"media\"} -->\n";
     $result .= "<figure class=\"wp-block-image\"><a href=\"$src\"><img src=\"$src\" alt=\"\" class=\"wp-image-$image_id\"/></a></figure>\n";
     $result .= "<!-- /wp:image -->\n\n";
+  }
+  foreach ($text_nodes as $video) {
+    $module_class = $video->getAttribute('module_class');
+    if (!preg_match("/mediaelement-video/", $module_class)) {
+      continue;
+    }
+
+    $iframe = _find_child_node($video, 'src', "/youtube/");
+    if (!$iframe) {
+      continue;
+    }
+
+    $src_iframe = $iframe->getAttribute('src');
+    preg_match("/embed\/([^\?]+)/", $src_iframe, $match);
+    $reference = esc_attr($match[1]);
+    $src = "https://www.youtube.com/watch?v=$reference";
+
+    $vertical = preg_match("/-vertical/", $module_class);
+    $vertical = $vertical ? " is-style-vertical" : "";
+
+    $result .= "<!-- wp:core-embed/youtube {\"url\":\"$src\",\"type\":\"video\",\"providerNameSlug\":\"youtube\",\"className\":\"wp-embed-aspect-4-3 wp-has-aspect-ratio$vertical\"} -->";
+    $result .= "\n<figure class=\"wp-block-embed-youtube wp-block-embed is-type-video is-provider-youtube wp-embed-aspect-4-3 wp-has-aspect-ratio$vertical\">";
+    $result .= "<div class=\"wp-block-embed__wrapper\">\n";
+    $result .= $src;
+    $result .= "\n</div>";
+    $result .= "</figure>\n";
+    $result .= "<!-- /wp:core-embed/youtube -->\n\n";
   }
   $result .= "<!-- /wp:fdd-block/recipe--media -->\n\n";
 
