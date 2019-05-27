@@ -306,16 +306,54 @@ function fdd__convert_art($doc) {
   $text_nodes = $doc->getElementsByTagName('et_pb_text');
   $image_nodes = $doc->getElementsByTagName('et_pb_image');
 
-  $node = fdd__find_node($text_nodes, 'module_class', "/recipe-basic-specs/"); // no comment...:)
-  if ($node) {
+  $descr_node = fdd__find_node($text_nodes, 'module_class', "/recipe-basic-specs/"); // no comment...:)
+  if ($descr_node) {
     $description .= "<!-- wp:fdd-block/art--description-container -->\n";
-    $subtitle = fdd__find_child_node($node, 'class', "/-subtitle/");
+    $subtitle = fdd__find_child_node($descr_node, 'class', "/-subtitle/");
     if ($subtitle) {
-      $node->removeChild($subtitle);
+      $descr_node->removeChild($subtitle);
     }
-    foreach ($node->childNodes as $child) {
-      // TODO - copy the inner loop from fdd__convert_recipe_paras..
-      $description .= $doc->saveHTML($child);
+
+    foreach ($descr_node->childNodes as $node) {
+      if ($node->nodeType == XML_TEXT_NODE) {
+        $text = fdd__get_inner_text($node);
+        if ($text) {
+          $description .= "<!-- wp:paragraph -->\n";
+          $description .= $text;
+          $description .= "\n<!-- /wp:paragraph -->\n";
+        }
+        continue;
+      }
+
+      $class = $node->getAttribute('class');
+
+      if (preg_match("/-subtitle$/", $class)) {
+        $description .= "<!-- wp:paragraph -->\n<p><strong>\n";
+        $description .= fdd__get_inner_text($node->firstChild);
+        $description .= "\n</strong></p>\n<!-- /wp:paragraph -->\n";
+        continue;
+      }
+
+      $node->removeAttribute('class');
+
+      if ($node->localName == 'p' || $node->localName == 'strong') {
+        $description .= "<!-- wp:paragraph -->\n";
+        $description .= $doc->saveHTML($node);
+        $description .= "\n<!-- /wp:paragraph -->\n";
+        continue;
+      }
+      if ($node->localName == 'ol') {
+        $description .= "<!-- wp:list {\"ordered\":true} -->\n";
+        $description .= $doc->saveHTML($node);
+        $description .= "\n<!-- /wp:list -->\n";
+        continue;
+      }
+      if ($node->localName == 'ul') {
+        $description .= "<!-- wp:list -->\n";
+        $description .= $doc->saveHTML($node);
+        $description .= "\n<!-- /wp:list -->\n";
+        continue;
+      }
     }
     $description .= "<!-- /wp:fdd-block/art--description-container -->\n";
   }
