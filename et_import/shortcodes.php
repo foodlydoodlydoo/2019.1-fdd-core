@@ -2,6 +2,7 @@
 
 $fdd_im_et_shortcodes = [
   'et_pb_section',
+  'et_pb_row',
   'et_pb_column',
   'et_pb_text',
   'et_pb_row_inner',
@@ -30,6 +31,14 @@ function fdd_dereg_shortcodes() {
 function fdd_sc_et_pb_section($atts, $content, $tag) {
   $module_class = $atts['module_class'];
   $result .= "<$tag module_class='$module_class'>";
+  $result .= do_shortcode($content);
+  $result .= "</$tag>";
+
+  return $result;
+}
+
+function fdd_sc_et_pb_row($atts, $content, $tag) {
+  $result .= "<$tag>";
   $result .= do_shortcode($content);
   $result .= "</$tag>";
 

@@ -85,6 +85,15 @@ function fdd__find_child_node($node, $attr, $value) {
   return false;
 }
 
+function fdd__next_non_text_node($node) {
+  $node = $node->nextSibling;
+  while ($node && $node->nodeType == XML_TEXT_NODE) {
+    $node = $node->nextSibling;
+  }
+
+  return $node;
+}
+
 function fdd__get_inner_text($node) {
   if (!$node) {
     return '';
@@ -92,14 +101,18 @@ function fdd__get_inner_text($node) {
 
   // returns all text in all child nodes.. fix using: +recursion
   // $node->nodeType == XML_TEXT_NODE
-  $text = $node->textContent;
-  $text = trim($text);
-  if (!$text) {
-    // Just the first...?
-    return fdd__get_inner_text($node->firstChild);
+  $child = $node->firstChild;
+  while ($child) {
+    if ($child->nodeType == XML_TEXT_NODE) {
+      $text = $child->textContent;
+      $text = trim($text);
+      return $text;
+    }
+
+    $child = $child->nextSibling;
   }
 
-  return $text;
+  return false;
 }
 
 function fdd__convert_recipe_specs($node) {
@@ -114,9 +127,9 @@ function fdd__convert_recipe_specs($node) {
   $specs = fdd__find_child_node($node, 'class', "/recipe-basic-specs-list/");
   $specs = $specs->firstChild;
   $prep_time = fdd__get_inner_text($specs);
-  $specs = $specs->nextSibling;
+  $specs = fdd__next_non_text_node($specs);
   $cook_time = fdd__get_inner_text($specs);
-  $specs = $specs->nextSibling;
+  $specs = fdd__next_non_text_node($specs);
   $portions = fdd__get_inner_text($specs);
 
   $result .= "<!-- wp:fdd-block/recipe--characteristics {\"level\":\"$level\",\"prep_time\":\"$prep_time\",\"cook_time\":\"$cook_time\",\"portions\":\"$portions\"} /-->\n\n";
@@ -131,65 +144,76 @@ function fdd__convert_recipe_paras($doc, $text_nodes) {
     }
 
     $node = $node->firstChild;
-    $content = '';
-    while ($node) {
-      if ($node->nodeType == XML_TEXT_NODE) {
-        $node = $node->nextSibling;
-        continue;
-      }
+    do {
+      // for possible repeated titles inside one et_pb_text
+      $repeat = false;
 
-      $class = $node->getAttribute('class');
-
-      if (preg_match("/-title$/", $class)) {
-        $title = fdd__get_inner_text($node);
-        $node = $node->nextSibling;
-        continue;
-      }
-      if (preg_match("/-subtitle$/", $class)) {
-        $content .= "<!-- wp:paragraph -->\n<p><strong>\n";
-        $content .= fdd__get_inner_text($node);
-        $content .= "\n</strong></p>\n<!-- /wp:paragraph -->\n";
-        $node = $node->nextSibling;
-        continue;
-      }
-
-      $node->removeAttribute('class');
-
-      if ($node->localName == 'p') {
-        if (fdd__get_inner_text($node->firstChild) == "Prep:") {
-          $title = "Preparation";
-          $node->removeChild($node->firstChild);
+      $content = '';
+      $title = '';
+      while ($node) {
+        if ($node->nodeType == XML_TEXT_NODE) {
+          $node = $node->nextSibling;
+          continue;
         }
-        $content .= "<!-- wp:paragraph -->\n";
-        $content .= $doc->saveHTML($node);
-        $content .= "\n<!-- /wp:paragraph -->\n";
-        $node = $node->nextSibling;
-        continue;
-      }
-      if ($node->localName == 'ol') {
-        $content .= "<!-- wp:list {\"ordered\":true} -->\n";
-        $content .= $doc->saveHTML($node);
-        $content .= "\n<!-- /wp:list -->\n";
-        $node = $node->nextSibling;
-        continue;
-      }
-      if ($node->localName == 'ul') {
-        $content .= "<!-- wp:list -->\n";
-        $content .= $doc->saveHTML($node);
-        $content .= "\n<!-- /wp:list -->\n";
-        $node = $node->nextSibling;
-        continue;
-      }
 
-      $node = $node->nextSibling;
-    }
+        $class = $node->getAttribute('class');
 
-    $title = strtolower($title);
-    $title = ucfirst($title);
-    $class_name = preg_match("/Ingre/", $title) ? ",\"className\":\"is-style-two-columns\"" : '';
-    $result .= "<!-- wp:fdd-block/para-with-title {\"title\":\"$title\"$class_name} -->\n";
-    $result .= $content;
-    $result .= "<!-- /wp:fdd-block/para-with-title -->\n";
+        if (preg_match("/-title$/", $class)) {
+          if ($title) {
+            $repeat = true;
+            break; // flush current para-with-title block, but return here (hence no shifting to the next sibling)
+          }
+          $title = fdd__get_inner_text($node);
+          $node = $node->nextSibling;
+          continue;
+        }
+        if (preg_match("/-subtitle$/", $class)) {
+          $content .= "<!-- wp:paragraph -->\n<p><strong>\n";
+          $content .= fdd__get_inner_text($node);
+          $content .= "\n</strong></p>\n<!-- /wp:paragraph -->\n";
+          $node = $node->nextSibling;
+          continue;
+        }
+
+        $node->removeAttribute('class');
+
+        if ($node->localName == 'p') {
+          // Fix for the 'Prep:' weirdness...
+          if (fdd__get_inner_text($node->firstChild) == "Prep:") {
+            $title = "Preparation";
+            $node->removeChild($node->firstChild);
+          }
+          $content .= "<!-- wp:paragraph -->\n";
+          $content .= $doc->saveHTML($node);
+          $content .= "\n<!-- /wp:paragraph -->\n";
+          $node = $node->nextSibling;
+          continue;
+        }
+        if ($node->localName == 'ol') {
+          $content .= "<!-- wp:list {\"ordered\":true} -->\n";
+          $content .= $doc->saveHTML($node);
+          $content .= "\n<!-- /wp:list -->\n";
+          $node = $node->nextSibling;
+          continue;
+        }
+        if ($node->localName == 'ul') {
+          $content .= "<!-- wp:list -->\n";
+          $content .= $doc->saveHTML($node);
+          $content .= "\n<!-- /wp:list -->\n";
+          $node = $node->nextSibling;
+          continue;
+        }
+
+        $node = $node->nextSibling;
+      } // while inside one et_pb_text
+
+      $title = strtolower($title);
+      $title = ucfirst($title);
+      $class_name = preg_match("/Ingre/", $title) ? ",\"className\":\"is-style-two-columns\"" : '';
+      $result .= "<!-- wp:fdd-block/para-with-title {\"title\":\"$title\"$class_name} -->\n";
+      $result .= $content;
+      $result .= "<!-- /wp:fdd-block/para-with-title -->\n";
+    } while ($repeat);
   }
 
   return $result;
