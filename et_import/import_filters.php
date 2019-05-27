@@ -1,7 +1,6 @@
 <?php
 
 const SOURCE_DOMAIN = "https://foodlydoodlydoo.com";
-const DESTINATION_DOMAIN = "https://stage.foodlydoodlydoo.com";
 
 // globals
 function fdd_reg_filters() {
@@ -18,7 +17,7 @@ function fdd_dereg_filters() {
 
 // filters
 function fdd_filter_import_post_meta_key($key) {
-  if (preg_match("/^_?et_|^_yoast_", $key)) {
+  if (preg_match("/^_?et_|^_yoast_/", $key)) {
     return false;
   }
   return $key;
@@ -235,11 +234,11 @@ function fdd__collect_media($images, $text_nodes) {
   foreach ($images as $image) {
     $result = '';
     $src = $image->getAttribute('src');
-    $src = str_replace(SOURCE_DOMAIN, DESTINATION_DOMAIN, $src);
+    $src = str_replace(SOURCE_DOMAIN, get_home_url(), $src);
+    $src = preg_replace("/\/uploads\/\d+\/\d+\//", '/uploads/', $src);
     $image_id = attachment_url_to_postid($src);
     if (!$image_id) {
-      // TODO REVERT!
-      //throw new Exception("Image not found by id $image_id!");
+      throw new Exception("Image not found by id $image_id!");
     }
 
     $result .= "<!-- wp:image {\"id\":$image_id,\"linkDestination\":\"media\"} -->\n";
@@ -289,7 +288,7 @@ function fdd__convert_recipe($doc) {
   $result .= "<!-- wp:fdd-block/recipe--page -->\n";
 
   $result .= "<!-- wp:fdd-block/recipe--media -->\n";
-  $result .= implode('\n', fdd__collect_media($images, $text_nodes));
+  $result .= implode("\n", fdd__collect_media($images, $text_nodes));
   $result .= "<!-- /wp:fdd-block/recipe--media -->\n\n";
 
   $result .= "<!-- wp:fdd-block/recipe--text -->\n";
@@ -363,9 +362,7 @@ function fdd__convert_art($doc) {
   $result .= "<!-- wp:fdd-block/art -->\n";
   $result .= array_shift($images);
   $result .= $description;
-  foreach ($images as $image) {
-    $result .= $image;
-  }
+  $result .= implode("\n", $images);
   $result .= "<!-- /wp:fdd-block/art -->\n";
 
   return $result;
@@ -377,14 +374,18 @@ function fdd_filter_wp_import_post_data_raw($post) {
     return $post;
   }
 
+  print("FDD: Converting \"" . $post['post_title'] . "\"<br/>");
+
   $content_in = $post['post_content'];
   $content_in = fdd__fix_markup($content_in);
   $content_in = do_shortcode($content_in);
 
-  $categories = array_filter($post['terms'], function ($val) {
-    return $val['domain'] == "category";
+  $terms = $post['terms'];
+
+  $categories = array_filter($terms, function ($val) {
+    return $val['domain'] == "category" && in_array($val['slug'], ['recipes', 'food-art', 'behind-the-scenes']);
   });
-  $category = $categories[0]['slug'];
+  $category = array_shift($categories)['slug'];
 
   libxml_use_internal_errors(true);
   $doc = \DOMDocument::loadHTML("<html><head><meta charset=\"UTF-8\" /></head><body>\n$content_in\n</body></html>",
@@ -406,7 +407,7 @@ function fdd_filter_wp_import_post_data_raw($post) {
     break;
 
   default:
-    $content_out = $content_in;
+    throw new Exception("Unknown category '$category' handler");
   }
 
   $post['post_content'] = $content_out;

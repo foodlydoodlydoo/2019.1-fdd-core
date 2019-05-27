@@ -1,18 +1,16 @@
 <?php
 
-namespace FDD\Core\et_im;
-
 require_once 'shortcodes.php';
 require_once 'import_filters.php';
 
-function import_start() {
-  reg_shortcodes();
-  reg_filters();
+function fdd_import_start() {
+  fdd_reg_shortcodes();
+  fdd_reg_filters();
 }
-add_action('import_start', 'FDD\Core\et_im\import_start');
+add_action('import_start', 'fdd_import_start');
 
-function import_end() {
-  dereg_shortcodes();
-  dereg_filters();
+function fdd_import_end() {
+  fdd_dereg_shortcodes();
+  fdd_dereg_filters();
 }
-add_action('import_end', 'FDD\Core\et_im\import_end');
+add_action('import_end', 'fdd_import_end');
