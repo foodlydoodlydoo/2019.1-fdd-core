@@ -99,17 +99,14 @@ function fdd__get_inner_text($node) {
     return '';
   }
 
-  // returns all text in all child nodes.. fix using: +recursion
-  // $node->nodeType == XML_TEXT_NODE
-  $child = $node->firstChild;
-  while ($child) {
-    if ($child->nodeType == XML_TEXT_NODE) {
-      $text = $child->textContent;
+  while ($node) {
+    if ($node->nodeType == XML_TEXT_NODE) {
+      $text = $node->textContent;
       $text = trim($text);
       return $text;
     }
 
-    $child = $child->nextSibling;
+    $node = $node->nextSibling;
   }
 
   return false;
@@ -122,15 +119,15 @@ function fdd__convert_recipe_specs($node) {
 
   $level = fdd__find_child_node($node, 'class', "/recipe-basic-specs-level/");
   $level = fdd__find_child_node($level, 'class', "/recipe-basic-specs-level-/");
-  $level = fdd__get_inner_text($level);
+  $level = fdd__get_inner_text($level->firstChild);
 
   $specs = fdd__find_child_node($node, 'class', "/recipe-basic-specs-list/");
   $specs = $specs->firstChild;
-  $prep_time = fdd__get_inner_text($specs);
+  $prep_time = fdd__get_inner_text($specs->firstChild);
   $specs = fdd__next_non_text_node($specs);
-  $cook_time = fdd__get_inner_text($specs);
+  $cook_time = fdd__get_inner_text($specs->firstChild);
   $specs = fdd__next_non_text_node($specs);
-  $portions = fdd__get_inner_text($specs);
+  $portions = fdd__get_inner_text($specs->firstChild);
 
   $result .= "<!-- wp:fdd-block/recipe--characteristics {\"level\":\"$level\",\"prep_time\":\"$prep_time\",\"cook_time\":\"$cook_time\",\"portions\":\"$portions\"} /-->\n\n";
 
@@ -152,6 +149,12 @@ function fdd__convert_recipe_paras($doc, $text_nodes) {
       $title = '';
       while ($node) {
         if ($node->nodeType == XML_TEXT_NODE) {
+          $text = fdd__get_inner_text($node);
+          if ($text) {
+            $content .= "<!-- wp:paragraph -->\n";
+            $content .= $text;
+            $content .= "\n<!-- /wp:paragraph -->\n";
+          }
           $node = $node->nextSibling;
           continue;
         }
@@ -163,13 +166,13 @@ function fdd__convert_recipe_paras($doc, $text_nodes) {
             $repeat = true;
             break; // flush current para-with-title block, but return here (hence no shifting to the next sibling)
           }
-          $title = fdd__get_inner_text($node);
+          $title = fdd__get_inner_text($node->firstChild);
           $node = $node->nextSibling;
           continue;
         }
         if (preg_match("/-subtitle$/", $class)) {
           $content .= "<!-- wp:paragraph -->\n<p><strong>\n";
-          $content .= fdd__get_inner_text($node);
+          $content .= fdd__get_inner_text($node->firstChild);
           $content .= "\n</strong></p>\n<!-- /wp:paragraph -->\n";
           $node = $node->nextSibling;
           continue;
@@ -177,9 +180,16 @@ function fdd__convert_recipe_paras($doc, $text_nodes) {
 
         $node->removeAttribute('class');
 
+        if ($node->localName == 'strong') {
+          $content .= "<!-- wp:paragraph -->\n";
+          $content .= $doc->saveHTML($node);
+          $content .= "\n<!-- /wp:paragraph -->\n";
+          $node = $node->nextSibling;
+          continue;
+        }
         if ($node->localName == 'p') {
           // Fix for the 'Prep:' weirdness...
-          if (fdd__get_inner_text($node->firstChild) == "Prep:") {
+          if (fdd__get_inner_text($node->firstChild->firstChild) == "Prep:") {
             $title = "Preparation";
             $node->removeChild($node->firstChild);
           }
