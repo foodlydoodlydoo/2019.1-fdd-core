@@ -376,6 +376,10 @@ function fdd_filter_wp_import_post_data_raw($post) {
 
   print("FDD: Converting \"" . $post['post_title'] . "\"<br/>");
 
+  $title_in = $post['post_title'];
+  $title_out = ucwords(strtolower($title_in));
+  $post['post_title'] = $title_out;
+
   $content_in = $post['post_content'];
   $content_in = fdd__fix_markup($content_in);
   $content_in = do_shortcode($content_in);
