@@ -4,6 +4,7 @@ require_once 'shortcodes.php';
 require_once 'import_filters.php';
 
 function fdd_import_start() {
+  set_time_limit(60);
   fdd_reg_shortcodes();
   fdd_reg_filters();
 }

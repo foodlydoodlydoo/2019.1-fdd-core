@@ -238,7 +238,7 @@ function fdd__collect_media($images, $text_nodes) {
     $src = preg_replace("/\/uploads\/\d+\/\d+\//", '/uploads/', $src);
     $image_id = attachment_url_to_postid($src);
     if (!$image_id) {
-      throw new Exception("Image not found by id $image_id!");
+      throw new Exception("Image not found by src $src!");
     }
 
     $result .= "<!-- wp:image {\"id\":$image_id,\"linkDestination\":\"media\"} -->\n";
