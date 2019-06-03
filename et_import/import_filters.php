@@ -262,7 +262,7 @@ function fdd__collect_media($images, $text_nodes) {
     $src_iframe = $iframe->getAttribute('src');
     preg_match("/embed\/([^\?]+)/", $src_iframe, $match);
     $reference = esc_attr($match[1]);
-    $src = "https://www.youtube.com/watch?v=$reference";
+    $src = "https://www.youtube.com/watch?v=$reference&rel=0&mode=opaque";
 
     $vertical = preg_match("/-vertical/", $module_class);
     $vertical = $vertical ? " is-style-vertical" : "";
