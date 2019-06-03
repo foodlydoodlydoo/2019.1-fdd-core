@@ -18,4 +18,6 @@ function menu_search_form($title, $item, $args, $depth) {
 
 add_filter('walker_nav_menu_start_el', 'FDD\Core\menu_search_form', 10, 4);
 
+add_filter('option_use_smilies', '__return_false');
+
 require_once 'et_import/converter.php';
