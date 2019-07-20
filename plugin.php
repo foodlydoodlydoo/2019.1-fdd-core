@@ -17,4 +17,24 @@ add_filter('pre_get_posts', function($query) {
   return $query;
 });
 
+
+add_filter('embed_oembed_html', function($cache) {
+  $html = \DOMDocument::loadHTML($cache);
+  $iframe = $html->getElementsByTagName('iframe')[0];
+  if (!$iframe) {
+    if (current_user_can('administrator')) {
+      throw new \Error('Cannot set additional args on the embeded video');
+    }
+    return $cache;
+  }
+
+  $src = $iframe->getAttribute('src');
+  $src .= '&rel=0&modestbranding=1';
+
+  $iframe->setAttribute('src', $src);
+  $cache = $html->saveHtml();
+
+  return $cache;
+}, 10, 1);
+
 require_once 'et_import/converter.php';
