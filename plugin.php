@@ -29,7 +29,7 @@ add_filter('embed_oembed_html', function($cache) {
   }
 
   $src = $iframe->getAttribute('src');
-  $src .= '&rel=0&modestbranding=1';
+  $src .= '&rel=0&modestbranding=1&cc_load_policy=0';
 
   $iframe->setAttribute('src', $src);
   $cache = $html->saveHtml();
