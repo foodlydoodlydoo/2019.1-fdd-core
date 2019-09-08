@@ -19,7 +19,9 @@ add_filter('pre_get_posts', function($query) {
 
 
 add_filter('embed_oembed_html', function($cache) {
-  $html = \DOMDocument::loadHTML($cache);
+  $html = \DOMDocument::loadHTML($cache, 
+    LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT);
+
   $iframe = $html->getElementsByTagName('iframe')[0];
   if (!$iframe) {
     if (current_user_can('administrator')) {
@@ -32,6 +34,7 @@ add_filter('embed_oembed_html', function($cache) {
   $src .= '&rel=0&modestbranding=1&cc_load_policy=0';
 
   $iframe->setAttribute('src', $src);
+  $iframe->removeAttribute('frameborder'); // obsolete
   $cache = $html->saveHtml();
 
   return $cache;
