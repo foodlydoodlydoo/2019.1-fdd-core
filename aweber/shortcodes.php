@@ -80,7 +80,7 @@ HTML;
 // ----------------------------------------------------------------------------
 
 $title_in_content = <<<HTML
-Do you like the conent? Subscribe for news!
+Do you like the conent? Subscribe&nbsp;for&nbsp;news!
 HTML;
 
 
@@ -106,9 +106,11 @@ function fdd_aweber_form_sc($atts, $content, $tag) {
 
     global $subscribe_inline_1;
     $content = <<<HTML
+      <div class="fdd-aweber-inline-form--wrapper">
       <div class="$classes">
       <span class="fdd-aweber--title">$title</span>
       $subscribe_inline_1
+      </div>
       </div>
 HTML;
     break;
