@@ -41,3 +41,4 @@ add_filter('embed_oembed_html', function($cache) {
 }, 10, 1);
 
 require_once 'et_import/converter.php';
+require_once 'aweber/shortcodes.php';
