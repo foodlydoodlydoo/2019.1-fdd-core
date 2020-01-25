@@ -9,11 +9,12 @@ $subscribe_inline_1 = <<<HTML
 <input type="hidden" name="meta_web_form_id" value="81309244" />
 <input type="hidden" name="meta_split_id" value="" />
 <input type="hidden" name="listname" value="awlist5120652" />
-<input type="hidden" name="redirect" value="https://stage.foodlydoodlydoo.com/thanks-for-your-subscription/" id="redirect_8f3521caa6bbf86aea1d12cfa3197de4" />
+<input type="hidden" name="redirect" value="https://stage.foodlydoodlydoo.com/thanks-for-your-subscription/" id="redirect_219726558a3a4c0d085f8dc369ec6ecb" />
 
 <input type="hidden" name="meta_adtracking" value="Subscribe_Form" />
 <input type="hidden" name="meta_message" value="1" />
 <input type="hidden" name="meta_required" value="email" />
+<!--input type="hidden" name="meta_forward_vars" value="1" /-->
 
 <input type="hidden" name="meta_tooltip" value="" />
 </div>
@@ -33,47 +34,6 @@ $subscribe_inline_1 = <<<HTML
 </div>
 <div style="display: none;"><img src="https://forms.aweber.com/form/displays.htm?id=HIzMDJxMLCw=" alt="" /></div>
 </form>
-<script type="text/javascript">
-// Special handling for in-app browsers that don't always support new windows
-(function() {
-    function browserSupportsNewWindows(userAgent) {
-        var rules = [
-            'FBIOS',
-            'Twitter for iPhone',
-            'WebView',
-            '(iPhone|iPod|iPad)(?!.*Safari\/)',
-            'Android.*(wv|\.0\.0\.0)'
-        ];
-        var pattern = new RegExp('(' + rules.join('|') + ')', 'ig');
-        return !pattern.test(userAgent);
-    }
-
-    if (!browserSupportsNewWindows(navigator.userAgent || navigator.vendor || window.opera)) {
-        document.getElementById('af-form-81309244').parentElement.removeAttribute('target');
-    }
-})();
-</script><script type="text/javascript">
-    <!--
-    (function() {
-        var IE = /*@cc_on!@*/false;
-        if (!IE) { return; }
-        if (document.compatMode && document.compatMode == 'BackCompat') {
-            if (document.getElementById("af-form-81309244")) {
-                document.getElementById("af-form-81309244").className = 'af-form af-quirksMode';
-            }
-            if (document.getElementById("af-body-81309244")) {
-                document.getElementById("af-body-81309244").className = "af-body inline af-quirksMode";
-            }
-            if (document.getElementById("af-header-81309244")) {
-                document.getElementById("af-header-81309244").className = "af-header af-quirksMode";
-            }
-            if (document.getElementById("af-footer-81309244")) {
-                document.getElementById("af-footer-81309244").className = "af-footer af-quirksMode";
-            }
-        }
-    })();
-    -->
-</script>
 HTML;
 // ----------------------------------------------------------------------------
 // END OF "Subscribe Form" (1)
