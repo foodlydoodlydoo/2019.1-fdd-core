@@ -3,13 +3,15 @@
 // ----------------------------------------------------------------------------
 // The generated "Subscribe Form" (1) from AWeber for 'Weekly newsletter' list
 // ----------------------------------------------------------------------------
+$thank_you_url = get_site_url(null, "/thanks-for-your-subscription/");
+
 $subscribe_inline_1 = <<<HTML
 <form method="post" class="af-form-wrapper" accept-charset="UTF-8" action="https://www.aweber.com/scripts/addlead.pl"  >
 <div style="display: none;">
 <input type="hidden" name="meta_web_form_id" value="81309244" />
 <input type="hidden" name="meta_split_id" value="" />
 <input type="hidden" name="listname" value="awlist5120652" />
-<input type="hidden" name="redirect" value="https://stage.foodlydoodlydoo.com/thanks-for-your-subscription/" id="redirect_219726558a3a4c0d085f8dc369ec6ecb" />
+<input type="hidden" name="redirect" value="$thank_you_url" id="redirect_40f4b9e51c6464c5233bb6e08ce9f15f" />
 
 <input type="hidden" name="meta_adtracking" value="Subscribe_Form" />
 <input type="hidden" name="meta_message" value="1" />
@@ -18,15 +20,26 @@ $subscribe_inline_1 = <<<HTML
 
 <input type="hidden" name="meta_tooltip" value="" />
 </div>
-<div id="af-form-81309244" class="af-form"><div id="af-body-81309244" class="af-body af-standards">
+<div id="af-form-81309244" class="af-form">
+<div id="af-body-81309244" class="af-body af-standards">
+
 <div class="af-element">
-<div class="af-textWrap"><input placeholder="your@email" class="text" id="awf_field-105194248" type="email" name="email" value="" tabindex="500" onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " />
+<div class="af-textWrap">
+<input placeholder="Name (optional)" id="awf_field-105812105" type="text" name="name" class="text" value=""  onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " tabindex="500" />
+</div>
+<div class="af-clear"></div></div>
+
+<div class="af-element">
+<div class="af-textWrap">
+<input placeholder="your@email" class="text" id="awf_field-105812106" type="email" name="email" value="" tabindex="501" onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " />
 </div>
 </div>
+
 <div class="af-element buttonContainer">
 <input name="submit" class="submit" type="submit" value="Subscribe" tabindex="501" />
 <div class="af-clear"></div>
 </div>
+
 <div class="af-element privacyPolicy" style="text-align: Right"><p>We respect your <a title="Privacy Policy" href="https://www.aweber.com/permission.htm" target="_blank" rel="nofollow">email privacy</a></p>
 <div class="af-clear"></div>
 </div>
