@@ -11,11 +11,11 @@ $subscribe_inline_1 = <<<HTML
 <input type="hidden" name="meta_web_form_id" value="81309244" />
 <input type="hidden" name="meta_split_id" value="" />
 <input type="hidden" name="listname" value="awlist5120652" />
-<input type="hidden" name="redirect" value="$thank_you_url" id="redirect_40f4b9e51c6464c5233bb6e08ce9f15f" />
+<input type="hidden" name="redirect" value="$thank_you_url" id="redirect_66ae5b3ee67e6a357388bac0a975b230" />
 
 <input type="hidden" name="meta_adtracking" value="Subscribe_Form" />
 <input type="hidden" name="meta_message" value="1" />
-<input type="hidden" name="meta_required" value="email" />
+<input type="hidden" name="meta_required" value="name,email" />
 <!--input type="hidden" name="meta_forward_vars" value="1" /-->
 
 <input type="hidden" name="meta_tooltip" value="" />
@@ -25,13 +25,13 @@ $subscribe_inline_1 = <<<HTML
 
 <div class="af-element">
 <div class="af-textWrap">
-<input placeholder="Name (optional)" id="awf_field-105812105" type="text" name="name" class="text" value=""  onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " tabindex="500" />
+<input placeholder="Name" id="awf_field-105814770" type="text" name="name" class="text" value=""  onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " tabindex="500" />
 </div>
 <div class="af-clear"></div></div>
 
 <div class="af-element">
 <div class="af-textWrap">
-<input placeholder="your@email" class="text" id="awf_field-105812106" type="email" name="email" value="" tabindex="501" onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " />
+<input placeholder="your@email" class="text" id="awf_field-105814771" type="email" name="email" value="" tabindex="501" onfocus=" if (this.value == '') { this.value = ''; }" onblur="if (this.value == '') { this.value='';} " />
 </div>
 </div>
 
