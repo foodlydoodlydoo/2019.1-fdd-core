@@ -36,7 +36,7 @@ $subscribe_inline_1 = <<<HTML
 </div>
 
 <div class="af-element buttonContainer">
-<input name="submit" class="submit" type="submit" value="Subscribe" tabindex="501" />
+<input name="submit" class="submit" type="submit" value="Subscribe" tabindex="502" />
 <div class="af-clear"></div>
 </div>
 
