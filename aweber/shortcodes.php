@@ -53,7 +53,7 @@ HTML;
 // ----------------------------------------------------------------------------
 
 $title_in_content = <<<HTML
-Do you like the conent? Subscribe&nbsp;for&nbsp;news!
+Do you like the content? Subscribe&nbsp;for&nbsp;news!
 HTML;
 
 
