@@ -10,6 +10,17 @@
 namespace FDD\Core;
 
 add_filter('option_use_smilies', '__return_false');
+
+/**
+ * Disabled until confirmed it doesn't break layout
+ **/
+add_filter('wp_lazy_loading_enabled', '__return_false');
+
+/** 
+ * Disabled because it breaks layout!
+ */
+add_filter('wp_img_tag_add_width_and_height_attr', '__return_false');
+
 add_filter('pre_get_posts', function($query) {
   if ($query->is_search) {
     $query->set('post_type', 'post');
