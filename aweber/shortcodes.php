@@ -67,7 +67,7 @@ function fdd_aweber_form_sc($atts, $content, $tag) {
     break;
   }
 
-  $classes = explode(" ", $atts['class']);
+  $classes = array_key_exists('class', $atts) ? explode(" ", $atts['class']) : array();
 
   $form = $atts['name'];
   switch ($form) {
