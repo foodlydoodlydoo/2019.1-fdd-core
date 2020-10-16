@@ -9,6 +9,13 @@
 
 namespace FDD\Core;
 
+function get_custom($name) {
+  if (function_exists('\get_custom')) {
+    return \get_custom($name);
+  }
+  return "";
+}
+
 add_filter('option_use_smilies', '__return_false');
 
 /**
