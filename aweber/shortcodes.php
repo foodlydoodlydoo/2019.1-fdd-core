@@ -67,6 +67,8 @@ function fdd_aweber_form_sc($atts, $content, $tag) {
     break;
   }
 
+  $message = FDD\Core\get_custom('subscribe_notice');
+
   $classes = array_key_exists('class', $atts) ? explode(" ", $atts['class']) : array();
 
   $form = $atts['name'];
@@ -82,6 +84,7 @@ function fdd_aweber_form_sc($atts, $content, $tag) {
       <div class="fdd-aweber-inline-form--wrapper">
       <div class="$classes">
       <span class="fdd-aweber--title">$title</span>
+      <span class="fdd-aweber--message">$message</span>
       $subscribe_inline_1
       </div>
       </div>
