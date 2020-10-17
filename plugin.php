@@ -16,6 +16,24 @@ function get_custom($name) {
   return "";
 }
 
+function get_custom_content($name) {
+  $variant = get_custom($name . "_var");
+  if (!$variant) {
+    return get_custom($name);
+  }
+  $content = get_custom($name . "_var_" . $variant);
+  return $content;
+}
+
+function get_sidebar($id) {
+  ob_start();
+  dynamic_sidebar($id);
+  $sidebar = ob_get_contents();
+  ob_end_clean();
+
+  return $sidebar;
+}
+
 add_filter('option_use_smilies', '__return_false');
 
 /**
