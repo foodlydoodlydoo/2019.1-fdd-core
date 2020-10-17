@@ -77,6 +77,10 @@ add_filter('embed_oembed_html', function($cache) {
   return $cache;
 }, 10, 1);
 
+add_action('admin_enqueue_scripts', function($hook) {
+  wp_enqueue_style("fdd-admin-style", plugin_dir_url(__FILE__) . "styles/custom-options-plus.css", false, "1.0");
+});
+
 require_once 'et_import/converter.php';
 require_once 'live_import/converter.php';
 require_once 'aweber/shortcodes.php';
