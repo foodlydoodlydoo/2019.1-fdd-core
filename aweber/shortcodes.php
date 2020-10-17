@@ -81,7 +81,7 @@ function fdd_aweber_form_sc($atts, $content, $tag) {
 
     global $subscribe_inline_1;
     $content = <<<HTML
-      <div class="fdd-aweber-inline-form--wrapper">
+      <div class="fdd-aweber-inline-form--wrapper home-call-to-action--wrap">
       <div class="$classes">
       <span class="fdd-aweber--title">$title</span>
       <span class="fdd-aweber--message">$message</span>
