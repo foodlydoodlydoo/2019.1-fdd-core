@@ -23,7 +23,7 @@ add_filter('option_use_smilies', '__return_false');
  **/
 add_filter('wp_lazy_loading_enabled', '__return_false');
 
-/** 
+/**
  * Disabled because it breaks layout!
  */
 add_filter('wp_img_tag_add_width_and_height_attr', '__return_false');
@@ -37,7 +37,8 @@ add_filter('pre_get_posts', function($query) {
 
 
 add_filter('embed_oembed_html', function($cache) {
-  $html = \DOMDocument::loadHTML($cache, 
+  $html = new \DOMDocument();
+  $html->loadHTML($cache,
     LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT);
 
   $iframe = $html->getElementsByTagName('iframe')[0];
