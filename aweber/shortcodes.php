@@ -52,22 +52,16 @@ HTML;
 // END OF "Subscribe Form" (1)
 // ----------------------------------------------------------------------------
 
-$title_in_content = <<<HTML
-Do you like the content? Subscribe&nbsp;for&nbsp;news!
-HTML;
-
 
 function fdd_aweber_form_sc($atts, $content, $tag) {
-  global $title_in_content;
-
   $title = $atts['title'];
   switch ($title) {
   case "(in-content)":
-    $title = $title_in_content;
+    $title = FDD\Core\get_custom_content('subscribe_title_content');
     break;
   }
 
-  $message = FDD\Core\get_custom('subscribe_notice');
+  $message = FDD\Core\get_custom_content('subscribe_notice');
 
   $classes = array_key_exists('class', $atts) ? explode(" ", $atts['class']) : array();
 
