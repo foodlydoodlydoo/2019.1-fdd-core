@@ -56,8 +56,11 @@ add_filter('pre_get_posts', function($query) {
 
 add_filter('embed_oembed_html', function($cache) {
   $html = new \DOMDocument();
+
+  libxml_use_internal_errors(true);
   $html->loadHTML($cache,
     LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_COMPACT);
+  libxml_clear_errors();
 
   $iframe = $html->getElementsByTagName('iframe')[0];
   if (!$iframe) {
